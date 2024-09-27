@@ -66,13 +66,12 @@ Get-Content C:\Users\<your-user-name>\.ssh\<your-key-name>.pub | Set-Clipboard
 
 2. Log in to your **DigitalOcean Account**
 3. Click **Settings** on the left navigation bar
-   ![[settings-menu.png]]
+   ![Settings Menu](/attachments/settings-menu.png)
 4. Click the **Security** tab > **Add SSH Key** button
-   ![[add-ssh-key.png]]
+   ![Adding SSH Key](/attachments/add-ssh-key.png)
 5. Paste the **Copied Key** into the **Public Key** box and decide on a key name
-   
-   ![[paste-public-key.png]]
-   6. Click **Add SSH Key**
+   ![Paste Public Key](/attachments/paste-public-key.png)
+6. Click **Add SSH Key**
 
 With our SSH Key, we can now upload our Arch Linux image for the first steps into creating the server.
 
