@@ -19,10 +19,10 @@ Users should also be familiar with or have:
 These instructions will walk you through several steps required for setting up the droplet using SSH keys and the `doctl`.
 
 1. Working with SSH key pairs
-2. Connecting a SSH Public Key to your DigitalOcean Account
-3. Uploading a Custom Image to DigitalOcean
-4. Installing `doctl`
-5. Configuring API Access for `doctl`
+2. Installing `doctl`
+3. Configuring API Access for `doctl`
+4. Uploading the Public Key to DigitalOcean account with `doctl`
+5. Uploading a Custom Image to DigitalOcean with `doctl`
 6. Initializing Droplet setup with `doctl` and Cloud-init
 7. Connecting to your Droplet with SSH
 8. Deploying another Droplet with `doctl`
@@ -59,48 +59,7 @@ ssh-keygen -t ed25519 -f C:\Users\<your-user-name>\.ssh\<key-name> -C "youremail
 
 6. Type a passphrase. You will need to remember this passphrase to securely access the server we will be making.
 
-After choosing your passphrase, at this point your SSH key pair has been created. Next we will learn to link it to our DigitalOcean account.
-
-# Adding an SSH Public key to your DigitalOcean Account
-
-We have successfully created the SSH key pair. We will have to add the public key to our DigitalOcean account to give us a secure way of logging into our server.
-
-1. Type and run the command below into the **Terminal** to copy the public key
-   
-```
-Get-Content C:\Users\<your-user-name>\.ssh\<your-key-name>.pub | Set-Clipboard
-```
-
-- `Get-Content C:\Users\<your-user-name>\.ssh\<your-key-name>.pub` grabs the content of the file at our specified directory and desired file. For our example, we are grabbing the text contents of our public key file
-- `|` is our pipeline to connect the output of our `Get-Content` and input it to our next command
-- `Set-Clipboard` will copy our output from the pipeline, in this case our public key, to the clipboard to allow us to paste our text
-
-**Note**: Like the previous step, make sure you replace the text within the “<>” tags with the respective details. Going forward for this tutorial, you will be expected to remember to do this!
-
-2. Log in to your **DigitalOcean Account**
-3. Click **Settings** on the left navigation bar
-   ![[settings-menu.png]]
-4. Click the **Security** tab > **Add SSH Key** button
-   ![[add-ssh-key.png]]
-5. Paste the **Copied Key** into the **Public Key** box and decide on a key name
-   
-   ![[paste-public-key.png]]
-   6. Click **Add SSH Key**
-
-With our SSH Key, we can now upload our Arch Linux image for the first steps into creating the server.
-
-# Uploading a Custom Image to DigitalOcean
-
-Custom images are Linux distributions. The custom image we will be working with in this tutorial is Arch Linux, a lightweight and flexible Linux distribution. We will learn to upload this custom image to our DigitalOcean account to create our server with our preferred image.
-
-1. While in a DigitalOcean Project, Click **Manage** on the left navigation bar to expand more options.
-2. Click **Backups & Snapshots** > **Custom Images** tab
-3. Click **Upload Image**
-4. Navigate and choose the **Arch Linux image** you have downloaded
-5. Click **Distribution** and choose **Arch Linux** to match our custom image
-6. Click your **closest region** 
-7. Click **Upload Image**
-
+After choosing your passphrase, at this point your SSH key pair has been created. We will need to use `doctl` to upload our public key to our DigitalOcean account. Next we will install and configure `doctl`.
 # Installing and Configuring doctl
 
 `doctl` is DigitalOcean’s official command-line interface (CLI). It allows you to interact with the DigitalOcean API via the command line. For us this means it will let us create, configure, and destroy DigitalOcean resources, specifically Droplets.
@@ -165,6 +124,73 @@ After the installation, we cannot quite use `doctl` yet. We will have to authent
 # Configuring API Access for doctl
 
 To manage our droplet, we would need to use the DigitalOcean API, but we will need to configure who we want to use the API and access our servers. Users will use the Personal Access Token to authenticate themselves and request access to the API to use `doctl`.
-# 
+
+## Generating API Token
+
+1. Click **API** on the left navigation bar
+2. Click **Generate New Token**
+3. Type `<your-Token-Name>` and choose the **Full Access** scopes.
+4. Click **Generate Token**
+5. Copy and Paste the **personal access token**
+
+**Caution**: Token is shown only once, copy and paste this token somewhere safe.
+
+## Granting account access to `doctl`
+
+1. Open the **Terminal**
+2. Type and run **the command below** to grant `doctl` access:
+   
+```
+doctl auth init --context <NAME>
+```
+
+This command allows you to initialize `doctl` with a token so you will be able to query and manage account details and resources. Give the authentication context a name and replace `<NAME>`.
+
+3. Paste in your **personal access token** that you have stored
+![[token-auth.png]]
+
+4. Validate that `doctl` is working by running:
+```
+doctl account get
+```
+
+- This command is used to retrieve the details from your account profile.
+
+If successful your output should look like:
+```
+User Account          Team     Droplet Limit   Email Verified  UUID             Status
+youremail@email.com  My Team         10           true         <uuid-numbers>   Active 
+```
+
+![[doctl-account-get.png]]
+
+Now that we have successfully configured `doctl`, we can start using it, first by adding the SSH public key we created to our DigitalOcean account.
+# Uploading the Public Key to DigitalOcean account with `doctl`
+
+We will be using `doctl` to grab and upload our public key to our DigitalOcean account.
+
+1. Open the **Terminal**
+2. Type and run **the command below**:
+   
+```
+doctl compute ssh-key import "My SSH Key" --public-key-file ~/.ssh/<key-name>.pub
+```
+
+- `doctl compute ssh-key import "My SSH Key"` is the subcommand of `doctl` that imports an existing SSH key from our local machine to our account. We would replace “My SSH Key” with the key name we want it to be named on the DigitalOcean account.
+- `--public-key-file` specifies that we want a public key file
+- `~/.ssh/<key-name>.pub` specifies the path we point to our public key file, if you are already in the home directory, you can try just a relative path of `.ssh/<key-name>.pub`
+
+If successful, you should see an output that looks like:
+
+```
+ID           Name              FingerPrint
+43529188     droplet-guide     b9:ce:b0:01:51:fe:2b:23:60:18:e6:7e:1a:5c:4c:31
+```
+
+Next we have to upload our custom image of Arch Linux onto DigitalOcean to use for our remote server.
+# Uploading a Custom Image to DigitalOcean
+
+Custom images are Linux distributions. The custom image we will be working with in this tutorial is Arch Linux, a lightweight and flexible Linux distribution. We will learn to upload this custom image to our DigitalOcean account to create our server with our preferred image.
+
 # Notes
-- Need upload custom image notes
+- Need upload custom image images
