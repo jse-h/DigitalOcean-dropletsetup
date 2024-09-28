@@ -18,14 +18,14 @@ Users should also be familiar with or have:
 
 These instructions will walk you through several steps required for setting up the droplet using SSH keys, the `doctl`, and configuring cloud-init for automating the initialization.
 
-1. Working with SSH key pairs
-2. Installing `doctl` onto Local Machine
-3. Configuring API Access for `doctl`
-4. Uploading the Public Key to DigitalOcean account with `doctl`
-5. Uploading a Custom Image to DigitalOcean with `doctl`
-6. Initializing Droplet setup with Cloud-init
-7. Deploying a Droplet with `doctl`
-8. Connecting to your new Droplet
+1. [Working with SSH key pairs](#working-with-ssh-key-pairs)
+2. [Installing `doctl` onto Local Machine](#installing-doctl-onto-local-machine)
+3. [Configuring API Access for `doctl`](#configuring-api-access-for-doctl)
+4. [Uploading the Public Key to DigitalOcean account with `doctl`](#uploading-the-public-key-to-digitalocean-account-with-doctl)
+5. [Uploading a Custom Image to DigitalOcean with `doctl`](#uploading-a-custom-image-to-digitalocean)
+6. [Initializing Droplet setup with Cloud-init](#initializing-droplet-setup-with-cloud-init)
+7. [Deploying a Droplet with `doctl`](#deploying-a-droplet-with-doctl)
+8. [Connecting to your new Droplet](#connecting-to-your-new-droplet)
 
 # Working with SSH key pairs
 
