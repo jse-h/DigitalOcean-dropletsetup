@@ -80,7 +80,7 @@ After choosing your passphrase, at this point your SSH key pair has been created
 sudo pacman -S doctl
 ```
 
-- `sudo` is for ‘superuser do’, which will temporarily elevate to root user privileges to run the next following commands. [^5]
+- `sudo` is for ‘superuser do’, which will temporarily elevate to root user privileges to run the next following commands.[^5]
 - `pacman` is our package manager for the official Arch Linux repository to download the `doctl` package
 - `-S` specifies to sync or install only
 
@@ -221,7 +221,7 @@ touch cloud-init-arch.yaml
 
 Remember to run the command `ls -a` to see if our `yaml` file is successfully created.
 
-!(Check for YAML File)[yaml-file-check.png]
+!(Check for YAML File)[/attachments/yaml-file-check.png]
 ## Editing the cloud-init file with Neovim
 
 1. Run the command below to edit our `yaml` file so we can choose our configurations for cloud-init
