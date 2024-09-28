@@ -54,7 +54,7 @@ ssh-keygen -t ed25519 -f ~/.ssh/<key-name> -C "youremail@email.com"
 - `-f C:\Users\<your-user-name>\.ssh\<key-name>` specifies the file name at our designated directory and desired key-name
 - `-C "youremail@email.com"` adds a comment with our email
 
-**Note**: Replace the text within the “<>” tags with your respective information. For example, you will replace “your-user-name” with your user found in the directory path name. You will also replace “youremail@email.com" with your desired email.
+>[!NOTE]: Replace the text within the “<>” tags with your respective information. For example, you will replace “your-user-name” with your user found in the directory path name. You will also replace “youremail@email.com" with your desired email.
 
 6. Type a passphrase. You will need to remember this passphrase to securely access the server we will be making.
 
@@ -70,7 +70,7 @@ After choosing your passphrase, at this point your SSH key pair has been created
 
 `doctl` is DigitalOcean’s official command-line interface (CLI). It allows you to interact with the DigitalOcean API via the command line. For us this means it will let us create, configure, and destroy DigitalOcean resources, specifically Droplets.
 
-**Warning**: When running the following commands in the Terminal, ensure that it is **Run as Administrator**
+>[!WARNING] : When running the following commands in the Terminal, ensure that it is **Run as Administrator**
 
 1. In the **Terminal**, type and run **the command below** to download the most recent version of `doctl`:
 
@@ -289,7 +289,7 @@ doctl compute droplet create --image <Image-ID> --size s-1vcpu-1gb --region sfo3
 
 ```
 
-- `doctl compute droplet create`: The command `doctl` requires to create Droplets onto your DigitalOcean account. It requires values for the `--image` and `--size` flags.
+- `doctl compute droplet create`: The command `doctl` requires to create Droplets onto your DigitalOcean account. It requires values for the `--image` and `--size` flags. [^1]
 - `--image <Image-ID>`: The OS image used to create the Droplet. In this case we point it to our custom image ID we uploaded. For example: `--image 166429465`
 - `--size s-1vcpu-1gb`: The number of processors and the amount of RAM each Droplet has. In this case, each Droplet has one processor and 1 GB of RAM.
 - `--region sfo3`: The region to create the Droplets in. In this example, `doctl` deploys the Droplets into the SFO3 datacenter region.
@@ -316,7 +316,7 @@ doctl compute droplet list --format ID,Name,PublicIPv4,Region
 
 This is the last step to our server! We secured access, configured the initialization, deployed it. Now we just need to connect to it via SSH.
 
-**Note**: Keep in mind the Public IPv4 Address that we have kept and saved. Also, Steps 1 - 4 are **optional**.
+>[!NOTE]: Keep in mind the Public IPv4 Address that we have kept and saved. Also, Steps 1 - 4 are **optional**.
 
 1. Navigate to your `.ssh` directory
 2. Create the config file by running the command `nvim config`
@@ -331,7 +331,6 @@ Host <Host-Name>
 	IdentityFile ~/.ssh/<key-name-here>
 	
 ```
-
 4. After pasting and replacing the details, write and save the config file with `:wq`
 5. Connect to your new deployed droplet by typing the following commands:
 
@@ -352,6 +351,10 @@ ssh -i ~/.ssh/<key-name> <username>@<Public IPv4 Address>
 Success! You have connected to your new droplet! You can always exit with `exit` and reconnect.
 # References
 
-https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/configuring_and_managing_cloud-init_for_rhel_9/introduction-to-cloud-init_cloud-content
-https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/configuring_and_managing_cloud-init_for_rhel_9/introduction-to-cloud-init_cloud-content#cloud-init-operates-in-stages_introduction-to-cloud-init
-https://cloudinit.readthedocs.io/en/latest/reference/examples.html
+How to automate droplet setup with cloud-init. DigitalOcean . (n.d.). https://docs.digitalocean.com/products/droplets/how-to/automate-setup-with-cloud-init/
+
+How to create a personal access token. DigitalOcean . (n.d.). https://docs.digitalocean.com/reference/api/create-personal-access-token/
+
+How to install and configure doctl. DigitalOcean . (n.d.). https://docs.digitalocean.com/reference/doctl/how-to/install/
+
+McNinch, N. (2024). Week 2 ACIT 2420: Create an SSH key pair to authenticate and connect to a DigitalOcean droplet. [Lecture Notes]. BCIT. https://gitlab.com/cit2420/2420-notes-f24/-/blob/main/2420-notes/week-two.md
