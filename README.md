@@ -6,7 +6,7 @@ DigitalOcean is a cloud computing vendor and service provider. DigitalOcean offe
 
 ## Requirements
 
-This guide is designed for users who are familiar with idea of remote cloud-based servers, what Linux is, but are not sure on how to set up a cloud-based server to host and manage. For this guide, we will be specifically using the **Arch Linux image** and **Windows operating systems**. Settings and commands will vary based on the user’s operating system. 
+This guide is designed for users who are familiar with idea of remote cloud-based servers, what Linux is, but are not sure on how to set up a cloud-based server to host and manage. For this guide, we will be specifically using the **Arch Linux image**.
 
 Users should also be familiar with or have:
 
@@ -19,11 +19,11 @@ Users should also be familiar with or have:
 These instructions will walk you through several steps required for setting up the droplet using SSH keys and the `doctl`.
 
 1. Working with SSH key pairs
-2. Installing `doctl`
+2. Installing `doctl` onto Local Machine
 3. Configuring API Access for `doctl`
 4. Uploading the Public Key to DigitalOcean account with `doctl`
 5. Uploading a Custom Image to DigitalOcean with `doctl`
-6. Initializing Droplet setup with `doctl` and Cloud-init
+6. Initializing Droplet setup with Cloud-init
 7. Connecting to your Droplet with SSH
 8. Deploying another Droplet with `doctl`
 
@@ -35,17 +35,18 @@ The key pair is based on two related but asymmetric keys: a private key and a pu
 
 ## Creating the SSH Key
 
-1. Open the **Terminal** in your Start Menu
+1. Open the **Terminal**
 2. Type and run the command `cd ~` to change to your home directory
 3. Type and run the command `mkdir .ssh` to make our `.ssh` directory.
 	This folder is where we are storing our SSH keys
-4. Type and run the command `ls` to list the contents of the directory to confirm we have made the `.ssh` directory.
-   ![[ssh-directory.png]]
+4. Type and run the command `ls -a` to list **all** the contents of the directory to confirm we have made the `.ssh` directory.
+
+[SSH DIRECTORY IMAGE HERE]
 
 5. Type and run the command below to generate your keys.
    
 ```
-ssh-keygen -t ed25519 -f C:\Users\<your-user-name>\.ssh\<key-name> -C "youremail@email.com"
+ssh-keygen -t ed25519 -f ~/.ssh/<key-name> -C "youremail@email.com"
 ```
 
 - `ssh-keygen` is the authentication key generation command
@@ -55,70 +56,44 @@ ssh-keygen -t ed25519 -f C:\Users\<your-user-name>\.ssh\<key-name> -C "youremail
 
 **Note**: Replace the text within the “<>” tags with your respective information. For example, you will replace “your-user-name” with your user found in the directory path name. You will also replace “youremail@email.com" with your desired email.
 
-![[ssh-keygen-example.png]]
+[[KEY CREATED WHILE IN DROPLET HERE]]
 
 6. Type a passphrase. You will need to remember this passphrase to securely access the server we will be making.
 
-After choosing your passphrase, at this point your SSH key pair has been created. We will need to use `doctl` to upload our public key to our DigitalOcean account. Next we will install and configure `doctl`.
-# Installing and Configuring doctl
+7. Type and run the command `cd .ssh` to change our directories into the .ssh folder. Then again, run the command `ls -a` to view the contents.
+![[ls-ssh-folder.png]]
+
+- `water-key` is our private key
+- `water-key.pub` is our public key that we will use to upload to our DigitalOcean account
+
+After choosing your passphrase, at this point your SSH key pair has been created. We will need to use `doctl` to upload our public key to our DigitalOcean account. Next we will install `doctl`.
+# Installing doctl onto Local Machine
 
 `doctl` is DigitalOcean’s official command-line interface (CLI). It allows you to interact with the DigitalOcean API via the command line. For us this means it will let us create, configure, and destroy DigitalOcean resources, specifically Droplets.
 
 **Warning**: When running the following commands in the Terminal, ensure that it is **Run as Administrator**
 
-1. Open the **Terminal**
-2. Type and run **the command below** to download the most recent version of `doctl`:
+1. In the **Terminal**, type and run **the command below** to download the most recent version of `doctl`:
 
 ```
-Invoke-WebRequest https://github.com/digitalocean/doctl/releases/download/v1.110.0/doctl-1.110.0-windows-amd64.zip -OutFile ~\doctl-1.110.0-windows-amd64.zip
+sudo pacman -S doctl
 ```
 
-- `Invoke-WebRequest` sends a request to a webpage to grab its contents. In this case we are grabbing the .zip file for `doctl` and outputting the zip file only.
+- `sudo` is for ‘superuser do’, which will temporarily elevate to root user privileges to run the next following commands.
+- `pacman` is our package manager for the official Arch Linux repository to download the `doctl` package
+- `-S` specifies to sync or install only
 
-3. Type and run **the command below** to extract the `doctl` binary:
+If installation or packages fail: 
 
+1. Type **the command below** to update the package manager:
 ```
-Expand-Archive -Path ~\doctl-1.110.0-windows-amd64.zip
-```
-
-- `Expand-Archive` extracts the zipped files to our specified `-Path` and our desired file, in this case it is our .zip file.
-
-4. Finally, type and run **the command below** to move the `doctl` binary into a new dedicated directory, and add it to your system’s path:
-
-```
-New-Item -ItemType Directory $env:ProgramFiles\doctl\
-Move-Item -Path ~\doctl-1.110.0-windows-amd64\doctl.exe -Destination $env:ProgramFiles\doctl\
-[Environment]::SetEnvironmentVariable(
-    "Path",
-    [Environment]::GetEnvironmentVariable("Path",
-    [EnvironmentVariableTarget]::Machine) + ";$env:ProgramFiles\doctl\",
-    [EnvironmentVariableTarget]::Machine)
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
+sudo pacman -Syu
 ```
 
-Alternatively, you can run the commands separately.
-```
-New-Item -ItemType Directory $env:ProgramFiles\doctl\
-```
+- `-y` flag specifies to refresh the local cache
+- `-u` flag specifies to system update
 
-- `New-Item -ItemType Directory` is the command to create a specified file with a specified file type, and in this case a directory. It is created at a specified path and desired name at the end of the path.
-
-```
-Move-Item -Path ~\doctl-1.110.0-windows-amd64\doctl.exe -Destination $env:ProgramFiles\doctl\
-```
-
-- `Move-Item` command moves an item and its properties and contents from the specified path and file name to our desired `-Destination` at the next specified path
-
-```
-[Environment]::SetEnvironmentVariable(
-    "Path",
-    [Environment]::GetEnvironmentVariable("Path",
-    [EnvironmentVariableTarget]::Machine) + ";$env:ProgramFiles\doctl\",
-    [EnvironmentVariableTarget]::Machine)
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
-```
-
-- In Windows, Environment Variables store information related to the current environment and affects the way running processes and files will behave on the device. In our case, this command will add the `doctl` path to our environment, which will allow us to run it from any terminal session.
+After the update, attempt to install the `doctl` package again.
 
 After the installation, we cannot quite use `doctl` yet. We will have to authenticate the DigitalOcean API to allow it access to `doctl`.
 # Configuring API Access for doctl
@@ -137,8 +112,7 @@ To manage our droplet, we would need to use the DigitalOcean API, but we will ne
 
 ## Granting account access to `doctl`
 
-1. Open the **Terminal**
-2. Type and run **the command below** to grant `doctl` access:
+1. In the **Terminal**, type and run **the command below** to grant `doctl` access:
    
 ```
 doctl auth init --context <NAME>
@@ -146,15 +120,25 @@ doctl auth init --context <NAME>
 
 This command allows you to initialize `doctl` with a token so you will be able to query and manage account details and resources. Give the authentication context a name and replace `<NAME>`.
 
-3. Paste in your **personal access token** that you have stored
+2. Paste in your **personal access token** that you have stored
+   
 ![[token-auth.png]]
 
-4. Validate that `doctl` is working by running:
+3. Type and run **the command below** to switch to the context with that we just named
+   
+```
+doctl auth switch --context "your-context-name"
+```
+
+- `doctl auth switch` allows you to switch between authentication contexts you have already created
+
+5. Validate that `doctl` is working by running:
+   
 ```
 doctl account get
 ```
 
-- This command is used to retrieve the details from your account profile.
+- `doctl account get` is used to retrieve the details from your account profile.
 
 If successful your output should look like:
 ```
@@ -169,8 +153,7 @@ Now that we have successfully configured `doctl`, we can start using it, first b
 
 We will be using `doctl` to grab and upload our public key to our DigitalOcean account.
 
-1. Open the **Terminal**
-2. Type and run **the command below**:
+1. In the **Terminal**, type and run **the command below**:
    
 ```
 doctl compute ssh-key import "My SSH Key" --public-key-file ~/.ssh/<key-name>.pub
@@ -181,10 +164,14 @@ doctl compute ssh-key import "My SSH Key" --public-key-file ~/.ssh/<key-name>.pu
 - `~/.ssh/<key-name>.pub` specifies the path we point to our public key file, if you are already in the home directory, you can try just a relative path of `.ssh/<key-name>.pub`
 
 If successful, you should see an output that looks like:
-
 ```
 ID           Name              FingerPrint
-43529188     droplet-guide     b9:ce:b0:01:51:fe:2b:23:60:18:e6:7e:1a:5c:4c:31
+43529188     droppy-guide      e2:d3:81:c3:60:8f:97:47:2a:2d:5e:53:79:ec:49:97
+```
+
+You can also validate your list of SSH keys and key ID any time with the command:
+```
+doctl compute ssh-key list
 ```
 
 Next we have to upload our custom image of Arch Linux onto DigitalOcean to use for our remote server.
@@ -192,5 +179,37 @@ Next we have to upload our custom image of Arch Linux onto DigitalOcean to use f
 
 Custom images are Linux distributions. The custom image we will be working with in this tutorial is Arch Linux, a lightweight and flexible Linux distribution. We will learn to upload this custom image to our DigitalOcean account to create our server with our preferred image.
 
+1. Click **Manage** on the left navigation bar
+2. Click **Backups & Snapshots**
+3. Click **Custom Images** > **Upload Image**
+4. Navigate to the **Arch Linux custom image** that you have downloaded onto your local machine
+5. Select **Arch Linux** for Distribution and **San Francisco** Server **3**
+
+# Initializing Droplet setup with Cloud-init
+
+Cloud-init is a utility that automates the initialization of cloud instances and uses the YAML-formatted configuration file to apply user-defined tasks.
+
+**YAML** is a programming language designed to be easy to read and understand as it is a human-readable data serialization language. These are often used for configuration files.
+
+We will also need to download the package **Neovim** which is a text editor based off another text editor called **Vim**.
+
+1. Type and run **the command below** to install neovim:
+```
+sudo pacman -S neovim
+```
+
+2. Type and run **the command below** to create our cloud-init YAML file:
+```
+touch cloud-init-arch.yaml
+```
+
+- `touch` is a fundamental Linux command and tool to create empty files
+- `cloud-init-arch.yaml` is our file name with extension `.yaml`
+
+3. 
 # Notes
 - Need upload custom image images
+
+# References
+
+https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/configuring_and_managing_cloud-init_for_rhel_9/introduction-to-cloud-init_cloud-content
