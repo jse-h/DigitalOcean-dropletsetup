@@ -16,7 +16,7 @@ Users should also be familiar with or have:
 4. an Arch Linux image
 ## Instructions Overview
 
-These instructions will walk you through several steps required for setting up the droplet using SSH keys and the `doctl`.
+These instructions will walk you through several steps required for setting up the droplet using SSH keys, the `doctl`, and configuring cloud-init for automating the initialization.
 
 1. Working with SSH key pairs
 2. Installing `doctl` onto Local Machine
@@ -41,7 +41,7 @@ The key pair is based on two related but asymmetric keys: a private key and a pu
 	This folder is where we are storing our SSH keys
 4. Type and run the command `ls -a` to list **all** the contents of the directory to confirm we have made the `.ssh` directory.
 
-[SSH DIRECTORY IMAGE HERE]
+!(.ssh directory created)[attachments/ssh-key-directory.png]
 
 5. Type and run the command below to generate your keys.
    
@@ -56,12 +56,11 @@ ssh-keygen -t ed25519 -f ~/.ssh/<key-name> -C "youremail@email.com"
 
 **Note**: Replace the text within the “<>” tags with your respective information. For example, you will replace “your-user-name” with your user found in the directory path name. You will also replace “youremail@email.com" with your desired email.
 
-[[KEY CREATED WHILE IN DROPLET HERE]]
-
 6. Type a passphrase. You will need to remember this passphrase to securely access the server we will be making.
 
 7. Type and run the command `cd .ssh` to change our directories into the .ssh folder. Then again, run the command `ls -a` to view the contents.
-![[ls-ssh-folder.png]]
+
+!(List SSH Folder)[attachments/ls-ssh-folder.png]
 
 - `water-key` is our private key
 - `water-key.pub` is our public key that we will use to upload to our DigitalOcean account
@@ -103,9 +102,15 @@ To manage our droplet, we would need to use the DigitalOcean API, but we will ne
 ## Generating API Token
 
 1. Click **API** on the left navigation bar
+
+!(API Menu)[api-button.png]
+
 2. Click **Generate New Token**
 3. Type `<your-Token-Name>` and choose the **Full Access** scopes.
-4. Click **Generate Token**
+4. Click **Generate Token
+
+!(Token Generation)[token-generation.png]
+
 5. Copy and Paste the **personal access token**
 
 **Caution**: Token is shown only once, copy and paste this token somewhere safe.
@@ -122,7 +127,7 @@ This command allows you to initialize `doctl` with a token so you will be able t
 
 2. Paste in your **personal access token** that you have stored
    
-![[token-auth.png]]
+!(Authorization Token)[token-auth.png]
 
 3. Type and run **the command below** to switch to the context with that we just named
    
@@ -146,7 +151,7 @@ User Account          Team     Droplet Limit   Email Verified  UUID             
 youremail@email.com  My Team         10           true         <uuid-numbers>   Active 
 ```
 
-![[doctl-account-get.png]]
+!(doctl Account Details)[doctl-account-get.png]
 
 Now that we have successfully configured `doctl`, we can start using it, first by adding the SSH public key we created to our DigitalOcean account.
 # Uploading the Public Key to DigitalOcean account with `doctl`
@@ -180,10 +185,15 @@ Next we have to upload our custom image of Arch Linux onto DigitalOcean to use f
 Custom images are Linux distributions. The custom image we will be working with in this tutorial is Arch Linux, a lightweight and flexible Linux distribution. We will learn to upload this custom image to our DigitalOcean account to create our server with our preferred image.
 
 1. Click **Manage** on the left navigation bar
+
+!(Manage Navigation Button)[manage-menu.png]
+
 2. Click **Backups & Snapshots**
 3. Click **Custom Images** > **Upload Image**
 4. Navigate to the **Arch Linux custom image** that you have downloaded onto your local machine
 5. Select **Arch Linux** for Distribution and **San Francisco** Server **3**
+
+!(Arch Linux Image Upload)[arch-linux-distro.png]
 
 # Initializing Droplet setup with Cloud-init
 
@@ -208,7 +218,7 @@ touch cloud-init-arch.yaml
 
 Remember to run the command `ls -a` to see if our `yaml` file is successfully created.
 
-![[yaml-file-check.png]]
+!(Check for YAML File)[yaml-file-check.png]
 ## Editing the cloud-init file with Neovim
 
 1. Run the command below to edit our `yaml` file so we can choose our configurations for cloud-init
@@ -221,7 +231,7 @@ nvim cloud-init-arch.yaml
 
 2. While in Neovim enter INSERT mode by **pressing** the `I` key. You will see on the bottom left it will say INSERT to show you are in the mode. 
 
-![[INSERT-mode.png]]
+!(INSERT Mode)[INSERT-mode.png]
 
 3. Copy and paste the following code below into our YAML file we created.
 
@@ -290,7 +300,7 @@ doctl compute droplet create --image <Image-ID> --size s-1vcpu-1gb --region sfo3
 
 **Caution**: Replace your text and values in the “<>” tags like the Image-ID and Key-ID making sure they match the exact ID values you found running the previous commands.
 
-![[deploy-droplet.png]]
+!(Deployed Droplet)[deploy-droplet.png]
 
 5. To validate your droplet has been created, you should have seen an output listing its details, also you can run the command:
 ```
@@ -337,7 +347,7 @@ ssh -i ~/.ssh/<key-name> <username>@<Public IPv4 Address>
 
 6. Type **your passphrase** to your SSH key that you have saved
 
-![[droplet2-connection.png]]
+!(Successful Droplet Connection)[droplet2-connection.png]
 
 Success! You have connected to your new droplet! You can always exit with `exit` and reconnect.
 # References
