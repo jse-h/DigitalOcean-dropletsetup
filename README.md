@@ -1,3 +1,5 @@
+# Digital Ocean Droplet Setup Guide
+
 # Introduction
 
 ## About DigitalOcean
